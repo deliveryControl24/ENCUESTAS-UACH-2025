@@ -88,12 +88,15 @@
         <div class="chart">
             <h2>Gráficos y Estadísticas</h2>
             <canvas id="sectorChart"></canvas>
+            <canvas id="barChart"></canvas>
         </div>
 
         <div class="download-buttons">
             <button onclick="downloadAsWord()">Descargar como Word</button>
             <button onclick="downloadAsExcel()">Descargar como Excel</button>
             <button onclick="downloadAsPDF()">Descargar como PDF</button>
+            <button onclick="downloadChart('sectorChart', 'Gráfico de Sectores')">Descargar Gráfico de Sectores</button>
+            <button onclick="downloadChart('barChart', 'Gráfico de Barras')">Descargar Gráfico de Barras</button>
         </div>
     </div>
 
@@ -101,6 +104,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.34.1/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const password = prompt("Ingrese la contraseña:");
@@ -137,8 +141,8 @@
                 }
             });
 
-            const ctx = document.getElementById('sectorChart').getContext('2d');
-            new Chart(ctx, {
+            const ctxPie = document.getElementById('sectorChart').getContext('2d');
+            new Chart(ctxPie, {
                 type: 'pie',
                 data: {
                     labels: Object.keys(sectorData),
@@ -156,6 +160,33 @@
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de barras
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(sectorData),
+                    datasets: [{
+                        label: 'Número de Negocios por Sector',
+                        data: Object.values(sectorData),
+                        backgroundColor: '#28a745'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
                     plugins: {
                         legend: {
                             position: 'top',
@@ -224,6 +255,18 @@
                 const doc = new jsPDF();
                 doc.autoTable({ html: '#participantTable' });
                 doc.save('participantes.pdf');
+            };
+
+            // Función para descargar gráficos
+            window.downloadChart = function (chartId, filename) {
+                const chartCanvas = document.getElementById(chartId);
+                html2canvas(chartCanvas).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = filename + '.png';
+                    link.click();
+                });
             };
         });
     </script>
