@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #28a745;
+            color: white;
+        }
+        h1 {
+            margin-top: 10px;
+        }
+        .content {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+        .chart, .download-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .download-buttons button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .download-buttons button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Panel de Administración de Encuestas</h1>
+    </header>
+
+    <div class="content">
+        <h2>Datos de Participantes</h2>
+        <table id="participantTable">
+            <thead>
+                <tr>
+                    <th>Nombre del Negocio</th>
+                    <th>Administrador</th>
+                    <th>Rol</th>
+                    <th>Teléfono</th>
+                    <th>Sector</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Datos se cargarán dinámicamente -->
+            </tbody>
+        </table>
+
+        <div class="chart">
+            <h2>Gráficos y Estadísticas</h2>
+            <canvas id="sectorChart"></canvas>
+        </div>
+
+        <div class="download-buttons">
+            <button onclick="downloadAsWord()">Descargar como Word</button>
+            <button onclick="downloadAsExcel()">Descargar como Excel</button>
+            <button onclick="downloadAsPDF()">Descargar como PDF</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.34.1/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const password = prompt("Ingrese la contraseña:");
+            if (password !== "1999") {
+                alert("Contraseña incorrecta");
+                window.location.href = "index.html";
+                return;
+            }
+
+            const participantTable = document.getElementById('participantTable').querySelector('tbody');
+            const participants = JSON.parse(localStorage.getItem('participants')) || [];
+
+            // Cargar datos en la tabla
+            participants.forEach(participant => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${participant.nombre_negocio}</td>
+                    <td>${participant.nombre_administrador}</td>
+                    <td>${participant.rol_emprendimiento}</td>
+                    <td>${participant.telefono}</td>
+                    <td>${participant.sector || participant.sector_otro}</td>
+                `;
+                participantTable.appendChild(row);
+            });
+
+            // Gráfico de sectores
+            const sectorData = {};
+            participants.forEach(participant => {
+                const sector = participant.sector || participant.sector_otro;
+                if (sectorData[sector]) {
+                    sectorData[sector]++;
+                } else {
+                    sectorData[sector] = 1;
+                }
+            });
+
+            const ctx = document.getElementById('sectorChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(sectorData),
+                    datasets: [{
+                        label: 'Sectores',
+                        data: Object.values(sectorData),
+                        backgroundColor: [
+                            '#28a745',
+                            '#007bff',
+                            '#ffc107',
+                            '#dc3545',
+                            '#17a2b8'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            // Función para descargar como Word
+            window.downloadAsWord = function () {
+                const doc = new docxtemplater();
+                const zip = new JSZip();
+
+                // Crear contenido del documento
+                const content = `
+                    <table>
+                        <tr>
+                            <th>Nombre del Negocio</th>
+                            <th>Administrador</th>
+                            <th>Rol</th>
+                            <th>Teléfono</th>
+                            <th>Sector</th>
+                        </tr>
+                        ${participants.map(p => `
+                            <tr>
+                                <td>${p.nombre_negocio}</td>
+                                <td>${p.nombre_administrador}</td>
+                                <td>${p.rol_emprendimiento}</td>
+                                <td>${p.telefono}</td>
+                                <td>${p.sector || p.sector_otro}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+
+                doc.loadZip(zip);
+                doc.setData({
+                    table: content
+                });
+
+                try {
+                    doc.render();
+                } catch (error) {
+                    console.error("Error al generar el documento Word:", error);
+                    return;
+                }
+
+                const blob = doc.getZip().generate({
+                    type: "blob",
+                    mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                });
+                saveAs(blob, "participantes.docx");
+            };
+
+            // Función para descargar como Excel
+            window.downloadAsExcel = function () {
+                const ws = XLSX.utils.table_to_sheet(participantTable);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Participantes');
+                XLSX.writeFile(wb, 'participantes.xlsx');
+            };
+
+            // Función para descargar como PDF
+            window.downloadAsPDF = function () {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.autoTable({ html: '#participantTable' });
+                doc.save('participantes.pdf');
+            };
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</body>
+</html>
+

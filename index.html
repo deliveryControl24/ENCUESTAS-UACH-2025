@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta sobre Registro y Facturación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #28a745;
+            color: white;
+        }
+        header img {
+            width: 150px;
+            border-radius: 50%;
+        }
+        h1 {
+            margin-top: 10px;
+        }
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #28a745;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+        input[type="text"],
+        input[type="tel"],
+        input[type="radio"],
+        input[type="checkbox"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        input[type="submit"],
+        .admin-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        input[type="submit"]:hover,
+        .admin-button:hover {
+            background-color: #218838;
+        }
+        .survey-stats, .participants, .thank-you {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        @media (max-width: 600px) {
+            form {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo de la Universidad Autónoma de Chinandega">
+        <h1>Encuesta sobre la Implementación de un Sistema de Registro y Facturación para Emprendimientos</h1>
+    </header>
+
+    <div class="survey-stats">
+        <p>Número de personas encuestadas: <span id="surveyCount">0</span></p>
+    </div>
+
+    <form id="surveyForm">
+        <h2>Datos Generales del Negocio:</h2>
+        <label>1. Nombre del negocio:</label>
+        <input type="text" name="nombre_negocio" required>
+
+        <label>2. Nombre del administrador o dueño del emprendimiento:</label>
+        <input type="text" name="nombre_administrador" required>
+
+        <label>3. Rol en el emprendimiento:</label>
+        <input type="text" name="rol_emprendimiento" required>
+
+        <label>4. Número de teléfono:</label>
+        <input type="tel" name="telefono" required>
+
+        <label>5. Sector del negocio:</label>
+        <input type="radio" name="sector" value="Alimentos y bebidas"> Alimentos y bebidas<br>
+        <input type="radio" name="sector" value="Comercio minorista"> Comercio minorista<br>
+        <input type="radio" name="sector" value="Servicios"> Servicios<br>
+        <input type="radio" name="sector" value="Otro"> Otro: <input type="text" name="sector_otro">
+
+        <label>6. ¿Cuánto tiempo lleva operando su negocio?</label>
+        <input type="radio" name="tiempo_operando" value="Menos de 1 año"> Menos de 1 año<br>
+        <input type="radio" name="tiempo_operando" value="1 a 3 años"> 1 a 3 años<br>
+        <input type="radio" name="tiempo_operando" value="Más de 3 años"> Más de 3 años
+
+        <label>7. ¿Cuántos empleados tiene su negocio?</label>
+        <input type="radio" name="empleados" value="Solo yo"> Solo yo<br>
+        <input type="radio" name="empleados" value="1-5 empleados"> 1-5 empleados<br>
+        <input type="radio" name="empleados" value="Más de 5 empleados"> Más de 5 empleados
+
+        <h2>Gestión de Pedidos y Facturación:</h2>
+        <label>8. ¿Cómo gestiona actualmente los pedidos de sus clientes?</label>
+        <input type="radio" name="gestion_pedidos" value="Papel y lápiz"> Papel y lápiz<br>
+        <input type="radio" name="gestion_pedidos" value="WhatsApp"> WhatsApp u otras aplicaciones de mensajería<br>
+        <input type="radio" name="gestion_pedidos" value="Software de gestión"> Software de gestión<br>
+        <input type="radio" name="gestion_pedidos" value="Otro"> Otro: <input type="text" name="gestion_pedidos_otro">
+
+        <label>9. ¿Qué dificultades enfrenta en la gestión de pedidos y facturación? (puede seleccionar más de una opción)</label>
+        <input type="checkbox" name="dificultades[]" value="Errores en los pedidos"> Errores en los pedidos<br>
+        <input type="checkbox" name="dificultades[]" value="Demora en la facturación"> Demora en la facturación<br>
+        <input type="checkbox" name="dificultades[]" value="Falta de control en inventario"> Falta de control en inventario<br>
+        <input type="checkbox" name="dificultades[]" value="Otro"> Otro: <input type="text" name="dificultades_otro">
+
+        <label>10. ¿Cómo emite sus facturas?</label>
+        <input type="radio" name="emision_facturas" value="Manual"> Manualmente en papel<br>
+        <input type="radio" name="emision_facturas" value="Software"> Software de facturación<br>
+        <input type="radio" name="emision_facturas" value="No emito"> No emito facturas<br>
+        <input type="radio" name="emision_facturas" value="Otro"> Otro: <input type="text" name="emision_facturas_otro">
+
+        <label>11. ¿Ha considerado implementar un sistema digital para la gestión de pedidos y facturación?</label>
+        <input type="radio" name="sistema_digital" value="Sí, pero no sé cómo hacerlo"> Sí, pero no sé cómo hacerlo<br>
+        <input type="radio" name="sistema_digital" value="Sí, pero es costoso"> Sí, pero es costoso<br>
+        <input type="radio" name="sistema_digital" value="No lo considero necesario"> No lo considero necesario<br>
+        <input type="radio" name="sistema_digital" value="Ya utilizo un sistema"> Ya utilizo un sistema
+
+        <h2>Preferencias sobre un Sistema de Gestión:</h2>
+        <label>12. ¿Qué funcionalidades considera más importantes en un sistema de gestión de pedidos y facturación?</label>
+        <input type="checkbox" name="funcionalidades[]" value="Registro automático de pedidos"> Registro automático de pedidos<br>
+        <input type="checkbox" name="funcionalidades[]" value="Facturación electrónica"> Facturación electrónica<br>
+        <input type="checkbox" name="funcionalidades[]" value="Gestión de inventario"> Gestión de inventario<br>
+        <input type="checkbox" name="funcionalidades[]" value="Reportes de ventas"> Reportes de ventas<br>
+        <input type="checkbox" name="funcionalidades[]" value="Integración con WhatsApp"> Integración con WhatsApp u otras apps<br>
+        <input type="checkbox" name="funcionalidades[]" value="Otro"> Otro: <input type="text" name="funcionalidades_otro">
+
+        <label>13. ¿Estaría dispuesto(a) a capacitarse para el uso de un sistema de gestión?</label>
+        <input type="radio" name="capacitarse" value="Sí"> Sí<br>
+        <input type="radio" name="capacitarse" value="No"> No
+
+        <h2>Comentarios o Sugerencias:</h2>
+        <label>14. ¿Qué otras necesidades tiene su negocio en cuanto a tecnología y digitalización?</label>
+        <textarea name="comentarios" rows="4" cols="50"></textarea>
+
+        <input type="submit" value="Enviar Encuesta">
+    </form>
+
+    <div class="participants">
+        <h3>Negocios Participantes:</h3>
+        <ul id="participantList"></ul>
+    </div>
+
+    <div class="thank-you">
+        <p>Muchas gracias a todos los negocios encuestados o dueños de negocios que hayan participado en esta encuesta, la cual es para la obtención del título de Ingeniería en Sistemas.</p>
+        <button class="admin-button" onclick="window.location.href='admin.html'">Ir al Panel de Administración</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const surveyCountElement = document.getElementById('surveyCount');
+            const surveyForm = document.getElementById('surveyForm');
+            const participantList = document.getElementById('participantList');
+
+            // Cargar el contador de encuestas desde localStorage
+            let surveyCount = localStorage.getItem('surveyCount');
+            if (!surveyCount) {
+                surveyCount = 0;
+            }
+            surveyCountElement.textContent = surveyCount;
+
+            // Cargar la lista de participantes desde localStorage
+            let participants = JSON.parse(localStorage.getItem('participants')) || [];
+            participants.forEach(participant => {
+                const li = document.createElement('li');
+                li.textContent = `${participant.nombre_negocio} - ${participant.nombre_administrador} (${participant.telefono})`;
+                participantList.appendChild(li);
+            });
+
+            // Manejar el envío del formulario
+            surveyForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                // Incrementar el contador de encuestas
+                surveyCount++;
+                localStorage.setItem('surveyCount', surveyCount);
+                surveyCountElement.textContent = surveyCount;
+
+                // Guardar los datos del participante
+                const formData = new FormData(surveyForm);
+                const participantData = {};
+                formData.forEach((value, key) => {
+                    participantData[key] = value;
+                });
+                participants.push(participantData);
+                localStorage.setItem('participants', JSON.stringify(participants));
+
+                // Actualizar la lista de participantes
+                const li = document.createElement('li');
+                li.textContent = `${participantData.nombre_negocio} - ${participantData.nombre_administrador} (${participantData.telefono})`;
+                participantList.appendChild(li);
+
+                alert('Encuesta enviada con éxito');
+                surveyForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>
+
